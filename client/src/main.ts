@@ -1,3 +1,5 @@
+import '@/assets/pico.scss'
+
 import { createPinia } from 'pinia'
 import { createApp } from 'vue'
 
