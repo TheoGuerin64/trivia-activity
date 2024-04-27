@@ -8,5 +8,14 @@ services:
     ports:
       - "8080:8080"
     restart: unless-stopped
+  server:
+    build:
+      context: server
+      target: dev
+    volumes:
+      - ./server:/app:ro
+    networks:
+      - internal
+    restart: unless-stopped
 networks:
   internal:

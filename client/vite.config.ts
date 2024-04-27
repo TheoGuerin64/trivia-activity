@@ -11,6 +11,15 @@ export default defineConfig({
     },
   },
   server: {
+    proxy: {
+      '/server': {
+        target: 'http://server:3000',
+        changeOrigin: true,
+        secure: false,
+        ws: true,
+        rewrite: (path) => path.replace(/^\/server/, ''),
+      },
+    },
     port: 8080,
     hmr: false,
   },
