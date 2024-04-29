@@ -1,20 +1,18 @@
 <script setup lang="ts">
-import { RouterView } from 'vue-router'
-
 import LoadingSpinner from './components/LoadingSpinner.vue'
 </script>
 
 <template>
   <router-view v-slot="{ Component }">
     <template v-if="Component">
-      <KeepAlive>
+      <keep-alive>
         <suspense timeout="0">
           <component :is="Component" />
           <template #fallback>
             <LoadingSpinner />
           </template>
         </suspense>
-      </KeepAlive>
+      </keep-alive>
     </template>
   </router-view>
 </template>
