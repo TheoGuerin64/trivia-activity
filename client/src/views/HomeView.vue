@@ -1,10 +1,13 @@
 <script setup lang="ts">
-import { socket, state } from '@/socket'
+import { useConnectionStore } from '@/stores/connection'
+
+const connectionStore = useConnectionStore()
+connectionStore.bindEvents()
 </script>
 
 <template>
   <main class="container">
-    <button @click="socket.disconnect" v-if="state.connected">Disconnect</button>
-    <button @click="socket.connect" v-else>Connect</button>
+    <button @click="connectionStore.disconnect" v-if="connectionStore.connected">Disconnect</button>
+    <button @click="connectionStore.connect" v-else>Connect</button>
   </main>
 </template>
