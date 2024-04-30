@@ -1,23 +1,32 @@
 services:
-  client:
+  client-app:
     build: client
     volumes:
-      - ./client:/app
+      - ./client/:/app/
     networks:
-      - internal
+      - client-network
     ports:
       - "8080:8080"
-    restart: unless-stopped
-  server:
+  client-tunnel:
+    image: cloudflare/cloudflared
+    command: tunnel --url client-app:8080
+    networks:
+      - client-network
+  server-app:
     build:
       context: server
       target: dev
     volumes:
-      - ./server:/app:ro
+      - ./server/:/app/
     networks:
-      - internal
+      - server-network
     ports:
       - "3000:3000"
-    restart: unless-stopped
+  server-tunnel:
+    image: cloudflare/cloudflared
+    command: tunnel --url server-app:3000
+    networks:
+      - server-network
 networks:
-  internal:
+  client-network:
+  server-network:
