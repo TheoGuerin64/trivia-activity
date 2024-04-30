@@ -23,11 +23,11 @@ onMounted(async () => {
         <suspense timeout="0">
           <component :is="Component" />
           <template #fallback>
-            <LoadingSpinner />
+            <LoadingSpinner text="Loading" />
           </template>
         </suspense>
       </keep-alive>
     </template>
   </router-view>
-  <LoadingSpinner v-else />
+  <LoadingSpinner text="Connecting" v-else />
 </template>
