@@ -1,5 +1,8 @@
 import socketio
 from aiohttp import web
+from socketio.exceptions import ConnectionRefusedError
+
+from api import APIError, discord
 
 sio = socketio.AsyncServer(cors_allowed_origins="*")
 app = web.Application()
@@ -7,13 +10,17 @@ sio.attach(app)
 
 
 @sio.event
-def connect(sid: str, environ: dict):
-    print("connect ", sid)
+async def connect(sid: str, environ: dict, auth: dict) -> bool | None:
+    if not auth:
+        return False
+    code = auth.get("code")
+    if not code:
+        return False
 
-
-@sio.event
-async def message(sid: str, data: str):
-    print("message ", data)
+    try:
+        await discord.getToken(code)
+    except APIError as e:
+        raise ConnectionRefusedError(str(e))
 
 
 @sio.event

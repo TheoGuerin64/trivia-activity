@@ -27,8 +27,6 @@ FROM base AS dev
 RUN pip3 install --no-cache-dir --upgrade pip && \
     pip3 install --no-cache-dir aiohttp-devtools
 
-COPY . /app/
-
 ENTRYPOINT ["adev", "runserver", ".", "--port", "3000"]
 
 FROM base AS prod

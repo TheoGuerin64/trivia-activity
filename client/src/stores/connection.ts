@@ -15,11 +15,21 @@ export const useConnectionStore = defineStore('connection', {
       socket.on('disconnect', () => {
         this.connected = false
       })
+
+      socket.on('error', (error: Error) => {
+        console.error(error)
+      })
+
+      socket.on('connect_error', (error: Error) => {
+        console.error(error)
+      })
     },
 
-    connect() {
+    connect(code: string) {
+      socket.auth = { code }
       socket.connect()
     },
+
     disconnect() {
       socket.disconnect()
     },
