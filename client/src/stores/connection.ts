@@ -1,5 +1,6 @@
-import { socket } from '@/socket'
 import { defineStore } from 'pinia'
+
+import { socket } from '@/socket'
 
 export const useConnectionStore = defineStore('connection', {
   state: () => ({

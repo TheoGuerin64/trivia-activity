@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
 
-import { authorize, sdk } from '@/sdk'
-import { useConnectionStore } from './stores/connection'
-
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
+import { authorize, sdk } from '@/sdk'
+import { useConnectionStore } from '@/stores/connection'
 
 const connectionStore = useConnectionStore()
 connectionStore.bindEvents()
