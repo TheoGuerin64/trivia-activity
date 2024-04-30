@@ -26,10 +26,5 @@ async def connect(sid: str, environ: dict, auth: dict) -> bool | None:
         raise ConnectionRefusedError(str(e))
 
 
-@sio.event
-def disconnect(sid: str):
-    print("disconnect ", sid)
-
-
 if __name__ == "__main__":
     web.run_app(app, port=3000)
