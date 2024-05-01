@@ -6,6 +6,7 @@ python = "^3.10"
 aiohttp = "^3.9.5"
 python-socketio = "^5.11.2"
 python-dotenv = "^1.0.1"
+pydantic = "^2.7.1"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.4.2"

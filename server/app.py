@@ -1,8 +1,10 @@
 import socketio
 from aiohttp import web
+from pydantic import ValidationError
 from socketio.exceptions import ConnectionRefusedError
 
 from api import APIError, discord
+from models import Auth
 from settings import DISCORD_CLIENT_ID
 
 sio = socketio.AsyncServer(
@@ -14,15 +16,14 @@ sio.attach(app)
 
 
 @sio.event
-async def connect(sid: str, environ: dict, auth: dict) -> bool | None:
-    if not auth:
-        return False
-    code = auth.get("code")
-    if not code:
-        return False
+async def connect(sid: str, environ: dict[str, str], raw_auth: dict[str, str]) -> None:
+    try:
+        auth = Auth.model_validate(raw_auth)
+    except ValidationError as error:
+        raise ConnectionRefusedError(error.json())
 
     try:
-        await discord.getToken(code)
+        await discord.getToken(auth.code)
     except APIError as e:
         raise ConnectionRefusedError(str(e))
 

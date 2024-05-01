@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 
+import { sdk } from '@/sdk'
 import { socket } from '@/socket'
 
 export const useConnectionStore = defineStore('connection', {
@@ -19,7 +20,7 @@ export const useConnectionStore = defineStore('connection', {
     },
 
     connect(code: string) {
-      socket.auth = { code }
+      socket.auth = { code: code, channel_id: sdk.channelId }
       socket.connect()
     },
 
