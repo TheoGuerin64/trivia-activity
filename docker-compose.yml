@@ -1,6 +1,8 @@
 services:
   client-app:
     build: client
+    env_file:
+      - client.env
     volumes:
       - ./client/:/app/
     networks:
@@ -14,6 +16,8 @@ services:
     build:
       context: server
       target: dev
+    env_file:
+      - server.env
     volumes:
       - ./server/:/app/
     networks:

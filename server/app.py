@@ -24,3 +24,6 @@ async def connect(sid: str, environ: dict[str, str], raw_auth: dict[str, str]) -
         await discord.getToken(auth.code)
     except APIError as e:
         raise ConnectionRefusedError(str(e))
+
+    await sio.enter_room(sid, auth.channel_id)
+    print(sio.manager.rooms)
