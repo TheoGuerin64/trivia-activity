@@ -18,16 +18,14 @@ FROM python:3.10-slim AS base
 WORKDIR /app
 
 COPY --from=builder /usr/local/lib/python3.10/site-packages /usr/local/lib/python3.10/site-packages
+COPY --from=builder /usr/local/bin /usr/local/bin
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
 
 FROM base AS dev
 
-RUN pip3 install --no-cache-dir --upgrade pip && \
-    pip3 install --no-cache-dir aiohttp-devtools
-
-ENTRYPOINT ["adev", "runserver", ".", "--port", "3000"]
+ENTRYPOINT ["uvicorn", "--port=3000", "--host=0.0.0.0", "--reload", "app:app"]
 
 FROM base AS prod
 
@@ -37,4 +35,4 @@ USER app
 
 COPY . /app/
 
-ENTRYPOINT ["python", "app.py"]
+ENTRYPOINT ["uvicorn", "--ws-max-size=65536", "--port=3000", "app:app"]
