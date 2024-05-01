@@ -6,7 +6,8 @@ from api import APIError, discord
 from settings import DISCORD_CLIENT_ID
 
 sio = socketio.AsyncServer(
-    cors_allowed_origins=f"https://{DISCORD_CLIENT_ID}.discordsays.com"
+    async_mode="aiohttp",
+    cors_allowed_origins=f"https://{DISCORD_CLIENT_ID}.discordsays.com",
 )
 app = web.Application()
 sio.attach(app)
