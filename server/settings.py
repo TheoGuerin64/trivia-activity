@@ -7,5 +7,7 @@ def get_env(key: str, default: str | None = None) -> str:
     return value
 
 
+DEV = get_env("DEV", "false").lower() in ("true", "1")
+
 DISCORD_CLIENT_ID = get_env("DISCORD_CLIENT_ID")
 DISCORD_CLIENT_SECRET = get_env("DISCORD_CLIENT_SECRET")

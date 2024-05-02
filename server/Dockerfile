@@ -18,14 +18,15 @@ FROM python:3.10-slim AS base
 WORKDIR /app
 
 COPY --from=builder /usr/local/lib/python3.10/site-packages /usr/local/lib/python3.10/site-packages
-COPY --from=builder /usr/local/bin /usr/local/bin
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
 
+ENTRYPOINT ["python", "app.py"]
+
 FROM base AS dev
 
-ENTRYPOINT ["uvicorn", "--port=3000", "--host=0.0.0.0", "--reload", "app:app"]
+ENV DEV=true
 
 FROM base AS prod
 
@@ -34,5 +35,3 @@ RUN addgroup --gid 1001 --system app && \
 USER app
 
 COPY . /app/
-
-ENTRYPOINT ["uvicorn", "--ws-max-size=65536", "--port=3000", "app:app"]

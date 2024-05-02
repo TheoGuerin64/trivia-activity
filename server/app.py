@@ -26,4 +26,13 @@ async def connect(sid: str, environ: dict[str, str], raw_auth: dict[str, str]) -
         raise ConnectionRefusedError(str(e))
 
     await sio.enter_room(sid, auth.channel_id)
-    print(sio.manager.rooms)
+
+
+if __name__ == "__main__":
+    import uvicorn
+
+    from settings import DEV
+
+    uvicorn.run(
+        "__main__:app", ws_max_size=2**12, host="0.0.0.0", port=3000, reload=DEV
+    )
