@@ -1,17 +1,15 @@
 import aiohttp
 
-from settings import DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET
-
 from .exceptions import APIError
 
 DISCORD_TOKEN_URL = "https://discord.com/api/oauth2/token"
 
 
-async def getToken(code: str) -> dict:
+async def getToken(client_id: str, client_secret: str, code: str) -> dict:
     headers = {"Content-Type": "application/x-www-form-urlencoded"}
     data = {
-        "client_id": DISCORD_CLIENT_ID,
-        "client_secret": DISCORD_CLIENT_SECRET,
+        "client_id": client_id,
+        "client_secret": client_secret,
         "grant_type": "authorization_code",
         "code": code,
     }

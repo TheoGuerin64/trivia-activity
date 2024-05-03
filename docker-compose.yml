@@ -22,7 +22,7 @@ services:
       - ./server/:/app/
     networks:
       - server-network
-  server-database:
+  server-db:
     image: postgres
     env_file:
       - server.env

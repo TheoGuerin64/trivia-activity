@@ -22,7 +22,7 @@ COPY --from=builder /usr/local/lib/python3.10/site-packages /usr/local/lib/pytho
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
 
-ENTRYPOINT ["python", "app.py"]
+ENTRYPOINT ["python", "-m", "app"]
 
 FROM base AS dev
 
