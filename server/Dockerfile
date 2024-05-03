@@ -22,11 +22,10 @@ COPY --from=builder /usr/local/lib/python3.10/site-packages /usr/local/lib/pytho
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
 
-ENTRYPOINT ["python", "-m", "app"]
 
 FROM base AS dev
 
-ENV DEV=true
+ENTRYPOINT ["python", "-m", "app"]
 
 FROM base AS prod
 
@@ -35,3 +34,5 @@ RUN addgroup --gid 1001 --system app && \
 USER app
 
 COPY . /app/
+
+ENTRYPOINT ["python", "-OO", "-m", "app"]
