@@ -1,15 +1,13 @@
-from pydantic import BaseModel, Field, ValidationError
+from pydantic import ValidationError
 from socketio import AsyncNamespace
 from socketio.exceptions import ConnectionRefusedError
 
 from api import APIError, discord
 
+from .db import Session
+from .models import Auth
+from .schemas import User
 from .settings import DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET
-
-
-class Auth(BaseModel):
-    code: str
-    channel_id: str = Field(pattern=r"\d{1,20}")
 
 
 class Events(AsyncNamespace):
@@ -27,3 +25,8 @@ class Events(AsyncNamespace):
             raise ConnectionRefusedError(str(e))
 
         await self.enter_room(sid, auth.channel_id)
+
+        user = User(sid=sid)
+        with Session() as session:
+            session.add(user)
+            session.commit()
