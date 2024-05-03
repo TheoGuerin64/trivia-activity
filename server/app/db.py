@@ -16,3 +16,9 @@ engine = sqlalchemy.create_engine(
 )
 Session = sessionmaker(bind=engine)
 Base: DeclarativeMeta = declarative_base()
+
+
+def init_db():
+    from . import schemas  # noqa: F401
+
+    Base.metadata.create_all(bind=engine)
