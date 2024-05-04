@@ -18,5 +18,6 @@ pyright = "^1.1.360"
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
-[tool.ruff.lint]
+[tool.ruff]
 extend-select = ["I"]
+line-length = 100
