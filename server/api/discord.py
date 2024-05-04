@@ -2,10 +2,8 @@ import aiohttp
 
 from .exceptions import APIError
 
-DISCORD_TOKEN_URL = "https://discord.com/api/oauth2/token"
 
-
-async def getToken(client_id: str, client_secret: str, code: str) -> dict:
+async def token(client_id: str, client_secret: str, code: str) -> dict:
     headers = {"Content-Type": "application/x-www-form-urlencoded"}
     data = {
         "client_id": client_id,
@@ -15,7 +13,17 @@ async def getToken(client_id: str, client_secret: str, code: str) -> dict:
     }
 
     async with aiohttp.ClientSession(headers=headers) as session:
-        async with session.post(DISCORD_TOKEN_URL, data=data) as response:
+        async with session.post("https://discord.com/api/oauth2/token", data=data) as response:
             if response.status != 200:
                 raise APIError("Failed to get token")
+            return await response.json()
+
+
+async def me(token: str) -> dict:
+    headers = {"Authorization": f"Bearer {token}"}
+
+    async with aiohttp.ClientSession(headers=headers) as session:
+        async with session.get("https://discord.com/api/users/@me") as response:
+            if response.status != 200:
+                raise APIError("Failed to get user")
             return await response.json()

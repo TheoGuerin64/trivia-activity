@@ -1,12 +1,13 @@
 import sqlalchemy
-from sqlalchemy.orm import declarative_base, sessionmaker
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm.decl_api import DeclarativeMeta
 
 from .settings import POSTGRES_DB, POSTGRES_PASSWORD, POSTGRES_USER
 
-engine = sqlalchemy.create_engine(
+engine = create_async_engine(
     sqlalchemy.URL.create(
-        "postgresql+psycopg2",
+        "postgresql+asyncpg",
         username=POSTGRES_USER,
         password=POSTGRES_PASSWORD,
         database=POSTGRES_DB,
@@ -14,11 +15,13 @@ engine = sqlalchemy.create_engine(
         port=5432,
     )
 )
-Session = sessionmaker(bind=engine)
+Session = async_sessionmaker(engine, expire_on_commit=False)
 Base: DeclarativeMeta = declarative_base()
 
 
-def init_db():
+async def init_tables():
     from . import schemas  # noqa: F401
 
-    Base.metadata.create_all(bind=engine)
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
+        await conn.run_sync(Base.metadata.create_all)
