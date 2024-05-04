@@ -23,5 +23,6 @@ async def init_tables():
     from . import schemas  # noqa: F401
 
     async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
+        if __debug__:
+            await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
