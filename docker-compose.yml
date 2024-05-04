@@ -22,6 +22,8 @@ services:
       - ./server/:/app/
     networks:
       - server-network
+    depends_on:
+      - server-db
   server-db:
     image: postgres
     env_file:
