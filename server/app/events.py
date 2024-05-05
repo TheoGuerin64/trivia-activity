@@ -34,17 +34,14 @@ class Events(AsyncNamespace):
                 user.connected = True
             await session.commit()
 
-        async with self.session(sid) as sessione:
-            sessione["user_id"] = user.id
+        await self.save_session(sid, {"user_id": user.id})
 
         return True
 
     async def on_disconnect(self, sid: str) -> None:
-        async with self.session(sid) as session:
-            user_id = session["user_id"]
+        user_id = (await self.get_session(sid))["user_id"]
 
         async with Session() as session:
-            user = await session.get(User, user_id)
-            assert user is not None
+            user = await User.get(session, user_id)
             user.connected = False
             await session.commit()
