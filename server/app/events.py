@@ -2,11 +2,10 @@ from pydantic import ValidationError
 from socketio import AsyncNamespace
 from sqlalchemy.exc import NoResultFound
 
-from api import APIError, discord
-
+from .api import APIError, discord
 from .db import Session
+from .db.schemas import User
 from .models import Auth
-from .schemas import User
 from .settings import DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET
 
 

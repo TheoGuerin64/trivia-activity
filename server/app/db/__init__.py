@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm.decl_api import DeclarativeMeta
 
-from .settings import POSTGRES_DB, POSTGRES_PASSWORD, POSTGRES_USER
+from ..settings import POSTGRES_DB, POSTGRES_PASSWORD, POSTGRES_USER
 
 engine = create_async_engine(
     sqlalchemy.URL.create(

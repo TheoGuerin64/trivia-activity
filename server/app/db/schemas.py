@@ -2,7 +2,7 @@ from sqlalchemy import Select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, mapped_column
 
-from .db import Base
+from . import Base
 
 
 class User(Base):
