@@ -25,5 +25,5 @@ async def me(token: str) -> dict:
     async with aiohttp.ClientSession(headers=headers) as session:
         async with session.get("https://discord.com/api/users/@me") as response:
             if response.status != 200:
-                raise APIError("Failed to get user")
+                raise APIError("Failed to get me")
             return await response.json()
