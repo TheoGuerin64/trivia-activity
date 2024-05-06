@@ -4,7 +4,7 @@ from sqlalchemy.exc import NoResultFound
 
 from .api import APIError, discord
 from .db import Session
-from .db.schemas import User
+from .db.schemas import Room, User
 from .models import Auth
 from .settings import DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET
 
@@ -26,12 +26,18 @@ class Events(AsyncNamespace):
                     session,
                     discord_id=me["id"],
                     socket_id=sid,
-                    channel_id=auth.channel_id,
                     connected=True,
                 )
             else:
                 user.socket_id = sid
                 user.connected = True
+
+            try:
+                room = await Room.get_by_channel_id(session, auth.channel_id)
+            except NoResultFound:
+                room = await Room.create(session, channel_id=auth.channel_id)
+            room.add_user(user)
+
             await session.commit()
 
         await self.save_session(sid, {"user_id": user.id})
