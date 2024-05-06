@@ -1,4 +1,4 @@
-from sqlalchemy import Select
+from sqlalchemy import CHAR, Boolean, Integer, Select, String
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -8,11 +8,11 @@ from . import Base
 class User(Base):
     __tablename__ = "users"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
-    discord_id: Mapped[str] = mapped_column(index=True, unique=True)
-    socket_id: Mapped[str] = mapped_column(unique=True)
-    channel_id: Mapped[str] = mapped_column()
-    connected: Mapped[bool] = mapped_column()
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    discord_id: Mapped[str] = mapped_column(String(20), index=True, unique=True)
+    socket_id: Mapped[str] = mapped_column(CHAR(20), unique=True)
+    channel_id: Mapped[str] = mapped_column(String(20))
+    connected: Mapped[bool] = mapped_column(Boolean)
 
     @staticmethod
     async def create(session: AsyncSession, **columns) -> "User":
@@ -39,4 +39,4 @@ class User(Base):
         return result.scalar_one()
 
     def __repr__(self):
-        return f"<User id={self.id} discord_id={self.discord_id} socket_id={self.socket_id} channel_id={self.channel_id} connected={self.connected}>"
+        return f"<User id={self.id} connected={self.connected}>"
