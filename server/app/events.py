@@ -22,12 +22,7 @@ class Events(AsyncNamespace):
             try:
                 user = await User.get_by_discord_id(session, me["id"])
             except NoResultFound:
-                user = await User.create(
-                    session,
-                    discord_id=me["id"],
-                    socket_id=sid,
-                    connected=True,
-                )
+                user = User(session, discord_id=me["id"], socket_id=sid)
             else:
                 user.socket_id = sid
                 user.connected = True
@@ -35,8 +30,8 @@ class Events(AsyncNamespace):
             try:
                 room = await Room.get_by_channel_id(session, auth.channel_id)
             except NoResultFound:
-                room = await Room.create(session, channel_id=auth.channel_id)
-            room.add_user(user)
+                room = Room(session, channel_id=auth.channel_id)
+            room.users.append(user)
 
             await session.commit()
 
