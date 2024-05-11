@@ -3,7 +3,8 @@ import os
 
 def get_env(key: str, default: str | None = None) -> str:
     value = os.environ.get(key, default=default)
-    assert value is not None, f"{key} environment variable is not set."
+    if value is None:
+        raise ValueError(f"{key} environment variable is not set.")
     return value
 
 
