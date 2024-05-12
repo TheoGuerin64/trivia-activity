@@ -3,4 +3,4 @@ from pydantic import BaseModel, Field, PositiveInt
 
 class Auth(BaseModel):
     code: str = Field(max_length=30)
-    channel_id: PositiveInt
+    channel_id: PositiveInt = Field(lt=2**64)
