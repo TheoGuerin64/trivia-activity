@@ -4,7 +4,7 @@ from sqlalchemy.exc import NoResultFound
 
 from .api import APIError, discord
 from .db import Session
-from .db.schemas import Room, RoomUser, User
+from .db.schemas import Room, RoomState, RoomUser, User
 from .models import Auth
 from .session import get_user_data, save_user_data
 from .settings import DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET
@@ -52,6 +52,14 @@ class Events(AsyncNamespace):
 
         async with Session() as session:
             room_user = await RoomUser.get(session, room_id, user_id)
-            room_user.connected = False
+
+            if len(room_user.room.connected_room_users) == 1:
+                await session.delete(room_user.room)
+            else:
+                match room_user.room.state:
+                    case RoomState.LOBBY:
+                        await session.delete(room_user)
+                    case RoomState.PLAYING:
+                        room_user.connected = False
 
             await session.commit()
