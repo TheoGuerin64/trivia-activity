@@ -52,11 +52,12 @@ class Events(AsyncNamespace):
 
         async with Session() as session:
             room_user = await RoomUser.get(session, user_id, room_id)
+            room = await room_user.room
 
-            if len(room_user.room.connected_room_users) == 1:
-                await session.delete(room_user.room)
+            if len(await room.connected_room_users) == 1:
+                await session.delete(room)
             else:
-                match room_user.room.state:
+                match room.state:
                     case RoomState.LOBBY:
                         await session.delete(room_user)
                     case RoomState.PLAYING:

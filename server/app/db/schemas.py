@@ -13,9 +13,13 @@ class User(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     discord_id: Mapped[int] = mapped_column(BigInteger, index=True, unique=True)
 
-    room_users: Mapped[list["RoomUser"]] = relationship(
-        "RoomUser", back_populates="user", cascade="delete"
+    _room_users: Mapped[list["RoomUser"]] = relationship(
+        "RoomUser", back_populates="_user", cascade="delete"
     )
+
+    @property
+    async def room_users(self) -> list["RoomUser"]:
+        return await self.awaitable_attrs._room_users
 
     def __init__(self, discord_id: int) -> None:
         super().__init__(discord_id=discord_id)
@@ -47,8 +51,16 @@ class RoomUser(Base):
     socket_id: Mapped[str] = mapped_column(CHAR(20), unique=True)
     connected: Mapped[bool] = mapped_column(default=True)
 
-    user: Mapped["User"] = relationship("User", back_populates="room_users", lazy="selectin")
-    room: Mapped["Room"] = relationship("Room", back_populates="room_users", lazy="selectin")
+    _user: Mapped["User"] = relationship("User", back_populates="_room_users")
+    _room: Mapped["Room"] = relationship("Room", back_populates="_room_users")
+
+    @property
+    async def user(self) -> "User":
+        return await self.awaitable_attrs._user
+
+    @property
+    async def room(self) -> "Room":
+        return await self.awaitable_attrs._room
 
     def __init__(
         self, room_id: int, user_id: int, socket_id: str, connected: bool | None = None
@@ -76,9 +88,13 @@ class Room(Base):
     channel_id: Mapped[int] = mapped_column(BigInteger, index=True, unique=True)
     state: Mapped[RoomState] = mapped_column(default=RoomState.LOBBY)
 
-    room_users: Mapped[list["RoomUser"]] = relationship(
-        "RoomUser", back_populates="room", cascade="delete"
+    _room_users: Mapped[list["RoomUser"]] = relationship(
+        "RoomUser", back_populates="_room", cascade="delete"
     )
+
+    @property
+    async def room_users(self) -> list["RoomUser"]:
+        return await self.awaitable_attrs._room_users
 
     def __init__(self, channel_id: int) -> None:
         super().__init__(channel_id=channel_id)
@@ -99,8 +115,8 @@ class Room(Base):
         return result.scalar_one()
 
     @property
-    def connected_room_users(self) -> tuple["RoomUser", ...]:
-        return tuple(room_user for room_user in self.room_users if room_user.connected)
+    async def connected_room_users(self) -> tuple["RoomUser", ...]:
+        return tuple(room_user for room_user in await self.room_users if room_user.connected)
 
     def __repr__(self) -> str:
         return f"<Room id={self.id}>"

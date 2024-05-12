@@ -1,7 +1,6 @@
 import sqlalchemy
-from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
-from sqlalchemy.orm import declarative_base
-from sqlalchemy.orm.decl_api import DeclarativeMeta
+from sqlalchemy.ext.asyncio import AsyncAttrs, async_sessionmaker, create_async_engine
+from sqlalchemy.orm import DeclarativeBase
 
 from ..settings import POSTGRES_DB, POSTGRES_PASSWORD, POSTGRES_USER
 
@@ -16,7 +15,10 @@ engine = create_async_engine(
     )
 )
 Session = async_sessionmaker(engine, expire_on_commit=False)
-Base: DeclarativeMeta = declarative_base()
+
+
+class Base(AsyncAttrs, DeclarativeBase):
+    pass
 
 
 async def init_tables():
