@@ -35,7 +35,7 @@ class Events(AsyncNamespace):
             await session.commit()
 
             try:
-                room_user = await RoomUser.get(session, room.id, user.id)
+                room_user = await RoomUser.get(session, user.id, room.id)
             except NoResultFound:
                 room_user = RoomUser(room.id, user.id, sid)
                 session.add(room_user)
@@ -51,7 +51,7 @@ class Events(AsyncNamespace):
         user_id, room_id = await get_user_data(self, sid)
 
         async with Session() as session:
-            room_user = await RoomUser.get(session, room_id, user_id)
+            room_user = await RoomUser.get(session, user_id, room_id)
 
             if len(room_user.room.connected_room_users) == 1:
                 await session.delete(room_user.room)

@@ -56,9 +56,9 @@ class RoomUser(Base):
         super().__init__(room_id=room_id, user_id=user_id, socket_id=socket_id, connected=connected)
 
     @staticmethod
-    async def get(session: AsyncSession, room_id: int, user_id: int) -> "RoomUser":
+    async def get(session: AsyncSession, user_id: int, room_id: int) -> "RoomUser":
         """Raises `NoResultFound` if the result returns no rows."""
-        return await session.get_one(RoomUser, (room_id, user_id))
+        return await session.get_one(RoomUser, (user_id, room_id))
 
     def __repr__(self) -> str:
         return f"<RoomUser room_id={self.room_id} user_id={self.user_id}>"
