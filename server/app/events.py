@@ -29,7 +29,7 @@ class Events(AsyncNamespace):
             try:
                 room = await Room.get_by_channel_id(session, auth.channel_id)
             except NoResultFound:
-                room = Room(auth.channel_id)
+                room = Room(auth.channel_id, user.id)
                 session.add(room)
 
             await session.commit()
@@ -45,6 +45,7 @@ class Events(AsyncNamespace):
 
             await session.commit()
 
+        await self.enter_room(sid, str(room.id))
         await save_user_data(self, sid, user.id, room.id)
 
     async def on_disconnect(self, sid: str) -> None:
@@ -53,10 +54,14 @@ class Events(AsyncNamespace):
         async with Session() as session:
             room_user = await RoomUser.get(session, user_id, room_id)
             room = await room_user.room
+            connected_room_users = await room.connected_room_users()
 
-            if len(await room.connected_room_users) == 1:
+            if len(connected_room_users) == 1:
                 await session.delete(room)
             else:
+                if room_user.is_leader():
+                    await room.change_leader()
+
                 match room.state:
                     case RoomState.LOBBY:
                         await session.delete(room_user)

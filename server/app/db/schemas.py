@@ -72,6 +72,9 @@ class RoomUser(Base):
         """Raises `NoResultFound` if the result returns no rows."""
         return await session.get_one(RoomUser, (user_id, room_id))
 
+    async def is_leader(self) -> bool:
+        return (await self.room).leader_id == self.user_id
+
     def __repr__(self) -> str:
         return f"<RoomUser room_id={self.room_id} user_id={self.user_id}>"
 
@@ -87,6 +90,7 @@ class Room(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     channel_id: Mapped[int] = mapped_column(BigInteger, index=True, unique=True)
     state: Mapped[RoomState] = mapped_column(default=RoomState.LOBBY)
+    leader_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
 
     _room_users: Mapped[list["RoomUser"]] = relationship(
         "RoomUser", back_populates="_room", cascade="delete"
@@ -96,8 +100,8 @@ class Room(Base):
     async def room_users(self) -> list["RoomUser"]:
         return await self.awaitable_attrs._room_users
 
-    def __init__(self, channel_id: int) -> None:
-        super().__init__(channel_id=channel_id)
+    def __init__(self, channel_id: int, leader_id: int) -> None:
+        super().__init__(channel_id=channel_id, leader_id=leader_id)
 
     @staticmethod
     async def get(session: AsyncSession, id: int) -> "Room":
@@ -114,9 +118,16 @@ class Room(Base):
         result = await session.execute(statement)
         return result.scalar_one()
 
-    @property
     async def connected_room_users(self) -> tuple["RoomUser", ...]:
         return tuple(room_user for room_user in await self.room_users if room_user.connected)
+
+    async def change_leader(self) -> None:
+        self.leader_id = [
+            room_user
+            for room_user in await self.room_users
+            if room_user.connected
+            if room_user.user_id != self.leader_id
+        ][0].user_id
 
     def __repr__(self) -> str:
         return f"<Room id={self.id}>"
