@@ -59,7 +59,7 @@ class Events(AsyncNamespace):
             if len(connected_room_users) == 1:
                 await session.delete(room)
             else:
-                if room_user.is_leader():
+                if await room_user.is_leader():
                     await room.change_leader()
 
                 match room.state:
