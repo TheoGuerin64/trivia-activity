@@ -45,6 +45,11 @@ class Events(AsyncNamespace):
 
             await session.commit()
 
+            user_data = {
+                "is_leader": await room_user.is_leader(),
+            }
+            await self.emit("user_data", user_data, to=sid)
+
         await self.enter_room(sid, str(room.id))
         await save_user_data(self, sid, user.id, room.id)
 

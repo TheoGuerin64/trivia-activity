@@ -4,9 +4,13 @@ import { onMounted } from 'vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import { authorize, sdk } from '@/sdk'
 import { useConnectionStore } from '@/stores/connection'
+import { useUserStore } from '@/stores/user'
 
 const connectionStore = useConnectionStore()
+const userStore = useUserStore()
+
 connectionStore.bindEvents()
+userStore.bindEvents()
 
 onMounted(async () => {
   await sdk.ready()
@@ -16,7 +20,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <router-view v-slot="{ Component }" v-if="connectionStore.connected">
+  <router-view v-slot="{ Component }" v-if="connectionStore.connected && userStore.isReady">
     <template v-if="Component">
       <keep-alive>
         <suspense timeout="0">
