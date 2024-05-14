@@ -66,6 +66,8 @@ class Events(AsyncNamespace):
             else:
                 if await room_user.is_leader():
                     await room.change_leader()
+                    leader = await RoomUser.get(session, room.leader_id, room.id)
+                    await self.emit("user_data", {"is_leader": True}, to=leader.socket_id)
 
                 match room.state:
                     case RoomState.LOBBY:
