@@ -1,4 +1,4 @@
-from typing import NamedTuple, TypeVarTuple
+from typing import NamedTuple
 
 from engineio import AsyncServer
 from socketio import AsyncNamespace
@@ -7,9 +7,6 @@ from socketio import AsyncNamespace
 class UserData(NamedTuple):
     user_id: int
     room_id: int
-
-
-Ts = TypeVarTuple("Ts")
 
 
 async def save_user_data(namespace: AsyncServer | AsyncNamespace, sid: str, data: UserData) -> None:
