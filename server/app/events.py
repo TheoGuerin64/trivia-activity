@@ -93,7 +93,11 @@ class Events(AsyncNamespace):
             if not await room_user.is_leader():
                 return
 
-            settings = Settings.model_validate(raw_settings)
+            try:
+                settings = Settings.model_validate(raw_settings)
+            except ValidationError:
+                await self.emit("error", "invalid settings", to=sid)
+                return
 
             room = await room_user.room
             room_settings = await room.settings
