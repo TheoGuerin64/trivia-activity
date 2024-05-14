@@ -23,7 +23,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <router-view v-slot="{ Component }" v-if="connectionStore.connected && userStore.isReady">
+  <router-view v-slot="{ Component }" v-if="connectionStore.connected">
     <template v-if="Component">
       <keep-alive>
         <suspense timeout="0">

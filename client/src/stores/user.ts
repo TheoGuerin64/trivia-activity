@@ -1,14 +1,14 @@
 import { defineStore } from 'pinia'
 
 import { socket } from '@/socket'
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 
 interface UserData {
   is_leader?: boolean
 }
 
 export const useUserStore = defineStore('user', () => {
-  const isLeader = ref<boolean | null>(null)
+  const isLeader = ref(false)
 
   function bindEvents() {
     socket.on('user_data', (value: UserData) => {
@@ -16,11 +16,11 @@ export const useUserStore = defineStore('user', () => {
         isLeader.value = value.is_leader
       }
     })
+
+    socket.on('error', (value) => {
+      console.log(value)
+    })
   }
 
-  const isReady = computed(() => {
-    return isLeader.value !== null
-  })
-
-  return { isLeader, isReady, bindEvents }
+  return { isLeader, bindEvents }
 })
