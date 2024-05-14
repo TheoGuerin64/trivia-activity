@@ -108,4 +108,6 @@ class Events(AsyncNamespace):
 
             await session.commit()
 
-            await self.emit("settings_update", room_settings.data(), room=str(room_user.room_id))
+            await self.emit(
+                "settings_update", room_settings.data(), room=str(room_user.room_id), skip_sid=sid
+            )
