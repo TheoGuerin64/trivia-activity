@@ -1,13 +1,21 @@
+from typing import NamedTuple, TypeVarTuple
+
 from engineio import AsyncServer
 from socketio import AsyncNamespace
 
 
-async def save_user_data(
-    namespace: AsyncServer | AsyncNamespace, sid: str, user_id: int, room_id: int
-) -> None:
-    await namespace.save_session(sid, {"user_id": user_id, "room_id": room_id})
+class UserData(NamedTuple):
+    user_id: int
+    room_id: int
 
 
-async def get_user_data(namespace: AsyncServer | AsyncNamespace, sid: str) -> tuple[int, int]:
+Ts = TypeVarTuple("Ts")
+
+
+async def save_user_data(namespace: AsyncServer | AsyncNamespace, sid: str, data: UserData) -> None:
+    await namespace.save_session(sid, {"user_data": data})
+
+
+async def get_user_data(namespace: AsyncServer | AsyncNamespace, sid: str) -> UserData:
     session = await namespace.get_session(sid)
-    return session["user_id"], session["room_id"]
+    return session["user_data"]

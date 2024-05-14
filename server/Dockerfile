@@ -1,4 +1,4 @@
-FROM python:3.10-slim AS builder
+FROM python:3.12-slim AS builder
 
 RUN apt-get update && apt-get install -y --no-install-recommends curl
 
@@ -13,11 +13,11 @@ POETRY_VIRTUALENVS_CREATE=false
 COPY poetry.lock pyproject.toml ./
 RUN poetry install --no-cache --no-root --only=main
 
-FROM python:3.10-slim AS base
+FROM python:3.12-slim AS base
 
 WORKDIR /app
 
-COPY --from=builder /usr/local/lib/python3.10/site-packages /usr/local/lib/python3.10/site-packages
+COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1

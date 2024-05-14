@@ -6,7 +6,7 @@ from .api import APIError, discord
 from .db import Session
 from .db.schemas import Room, RoomState, RoomUser, User
 from .models import Auth, Settings
-from .session import get_user_data, save_user_data
+from .session import UserData, get_user_data, save_user_data
 from .settings import DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET
 
 
@@ -51,7 +51,7 @@ class Events(AsyncNamespace):
             await self.emit("user_data", user_data, to=sid)
 
         await self.enter_room(sid, str(room.id))
-        await save_user_data(self, sid, user.id, room.id)
+        await save_user_data(self, sid, UserData(user.id, room.id))
 
     async def on_disconnect(self, sid: str) -> None:
         user_id, room_id = await get_user_data(self, sid)

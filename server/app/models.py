@@ -1,5 +1,3 @@
-from typing import Optional
-
 from pydantic import BaseModel, Field, PositiveInt
 
 
@@ -9,5 +7,5 @@ class Auth(BaseModel):
 
 
 class Settings(BaseModel):
-    round_count: Optional[int] = Field(ge=1, le=10, default=None)
-    difficulty: Optional[int] = Field(ge=0, le=3, default=None)
+    round_count: int | None = Field(ge=1, le=10, default=None)
+    difficulty: int | None = Field(ge=0, le=3, default=None)
