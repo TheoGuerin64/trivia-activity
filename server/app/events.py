@@ -4,7 +4,7 @@ from sqlalchemy.exc import NoResultFound
 
 from .api import APIError, discord
 from .db import Session
-from .db.schemas import Room, RoomState, RoomUser, User
+from .db.schemas import Room, RoomSettings, RoomState, RoomUser, User
 from .models import Auth, Settings
 from .session import UserData, get_user_data, save_user_data
 from .settings import DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET
@@ -33,6 +33,14 @@ class Events(AsyncNamespace):
                 session.add(room)
 
             await session.commit()
+
+            try:
+                room_settings = await RoomSettings.get(session, room.id)
+            except NoResultFound:
+                room_settings = RoomSettings(room.id)
+                session.add(room_settings)
+            else:
+                await self.emit("settings_update", room_settings.data(), to=sid)
 
             try:
                 room_user = await RoomUser.get(session, user.id, room.id)
@@ -77,7 +85,7 @@ class Events(AsyncNamespace):
 
             await session.commit()
 
-    async def on_setting_update(self, sid: str, raw_settings: dict[str, str]) -> None:
+    async def on_settings_update(self, sid: str, raw_settings: dict[str, str]) -> None:
         user_id, room_id = await get_user_data(self, sid)
 
         async with Session() as session:
@@ -87,8 +95,13 @@ class Events(AsyncNamespace):
 
             settings = Settings.model_validate(raw_settings)
 
-            await self.emit(
-                "setting_update",
-                settings.model_dump(exclude_none=True),
-                room=str(room_user.room_id),
-            )
+            room = await room_user.room
+            room_settings = await room.settings
+            if settings.round_count is not None:
+                room_settings.round_count = settings.round_count
+            if settings.difficulty is not None:
+                room_settings.difficulty = settings.difficulty
+
+            await session.commit()
+
+            await self.emit("settings_update", room_settings.data(), room=str(room_user.room_id))

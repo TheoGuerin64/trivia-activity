@@ -20,7 +20,7 @@ export const useSettingsStore = defineStore('settings', () => {
   const difficulty = ref(Difficulty.RANDOM)
 
   function bindEvents() {
-    socket.on('setting_update', (data: SettingsData) => {
+    socket.on('settings_update', (data: SettingsData) => {
       if (data.round_count !== undefined) {
         roundCount.value = data.round_count
       }
@@ -31,11 +31,11 @@ export const useSettingsStore = defineStore('settings', () => {
   }
 
   watch(roundCount, (value: number) => {
-    socket.emit('setting_update', { round_count: value })
+    socket.emit('settings_update', { round_count: value })
   })
 
   watch(difficulty, (value: Difficulty) => {
-    socket.emit('setting_update', { difficulty: value.valueOf() })
+    socket.emit('settings_update', { difficulty: value.valueOf() })
   })
 
   return { roundCount, difficulty, bindEvents }

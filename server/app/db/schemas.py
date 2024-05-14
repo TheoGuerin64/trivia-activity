@@ -95,10 +95,17 @@ class Room(Base):
     _room_users: Mapped[list[RoomUser]] = relationship(
         "RoomUser", back_populates="_room", cascade="delete"
     )
+    _settings: Mapped[RoomSettings] = relationship(
+        "RoomSettings", back_populates="_room", cascade="delete"
+    )
 
     @property
     async def room_users(self) -> list[RoomUser]:
         return await self.awaitable_attrs._room_users
+
+    @property
+    async def settings(self) -> RoomSettings:
+        return await self.awaitable_attrs._settings
 
     def __init__(self, channel_id: int, leader_id: int) -> None:
         super().__init__(channel_id=channel_id, leader_id=leader_id)
@@ -131,3 +138,41 @@ class Room(Base):
 
     def __repr__(self) -> str:
         return f"<Room id={self.id}>"
+
+
+class Difficulty(Enum):
+    RANDOM = 0
+    EASY = 1
+    MEDIUM = 2
+    HARD = 3
+
+
+class RoomSettings(Base):
+    __tablename__ = "room_settings"
+
+    room_id: Mapped[int] = mapped_column(ForeignKey("rooms.id"), primary_key=True)
+    round_count: Mapped[int] = mapped_column(default=10)
+    difficulty: Mapped[Difficulty] = mapped_column(default=Difficulty.RANDOM)
+
+    _room: Mapped[Room] = relationship("Room", back_populates="_settings")
+
+    @property
+    async def room(self) -> Room:
+        return await self.awaitable_attrs._room
+
+    def __init__(self, room_id: int) -> None:
+        super().__init__(room_id=room_id)
+
+    @staticmethod
+    async def get(session: AsyncSession, room_id: int) -> RoomSettings:
+        """Raises `NoResultFound` if the result returns no rows."""
+        return await session.get_one(RoomSettings, room_id)
+
+    def data(self) -> dict[str, str | int]:
+        return {
+            "round_count": self.round_count,
+            "difficulty": self.difficulty.value,
+        }
+
+    def __repr__(self) -> str:
+        return f"<RoomSettings room_id={self.room_id}>"

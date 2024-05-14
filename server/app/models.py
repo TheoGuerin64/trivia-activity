@@ -1,5 +1,7 @@
 from pydantic import BaseModel, Field, PositiveInt
 
+from .db.schemas import Difficulty
+
 
 class Auth(BaseModel):
     code: str = Field(max_length=30)
@@ -8,4 +10,4 @@ class Auth(BaseModel):
 
 class Settings(BaseModel):
     round_count: int | None = Field(ge=1, le=10, default=None)
-    difficulty: int | None = Field(ge=0, le=3, default=None)
+    difficulty: Difficulty | None = Field(default=None)
