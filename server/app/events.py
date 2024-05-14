@@ -5,7 +5,7 @@ from sqlalchemy.exc import NoResultFound
 from .api import APIError, discord
 from .db import Session
 from .db.schemas import Room, RoomState, RoomUser, User
-from .models import Auth
+from .models import Auth, Settings
 from .session import get_user_data, save_user_data
 from .settings import DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET
 
@@ -74,3 +74,19 @@ class Events(AsyncNamespace):
                         room_user.connected = False
 
             await session.commit()
+
+    async def on_setting_update(self, sid: str, raw_settings: dict[str, str]) -> None:
+        user_id, room_id = await get_user_data(self, sid)
+
+        async with Session() as session:
+            room_user = await RoomUser.get(session, user_id, room_id)
+            if not await room_user.is_leader():
+                return
+
+            settings = Settings.model_validate(raw_settings)
+
+            await self.emit(
+                "setting_update",
+                settings.model_dump(exclude_none=True),
+                room=str(room_user.room_id),
+            )

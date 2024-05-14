@@ -4,13 +4,16 @@ import { onMounted } from 'vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import { authorize, sdk } from '@/sdk'
 import { useConnectionStore } from '@/stores/connection'
+import { useSettingsStore } from '@/stores/settings'
 import { useUserStore } from '@/stores/user'
 
 const connectionStore = useConnectionStore()
 const userStore = useUserStore()
+const settingsStore = useSettingsStore()
 
 connectionStore.bindEvents()
 userStore.bindEvents()
+settingsStore.bindEvents()
 
 onMounted(async () => {
   await sdk.ready()
