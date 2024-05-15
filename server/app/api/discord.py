@@ -14,8 +14,11 @@ async def token(client_id: str, client_secret: str, code: str) -> dict:
 
     async with aiohttp.ClientSession(headers=headers) as session:
         async with session.post("https://discord.com/api/oauth2/token", data=data) as response:
-            if response.status != 200:
-                raise APIError("Failed to get token")
+            match response.status:
+                case 200:
+                    pass
+                case _:
+                    raise APIError("Request failed")
             return await response.json()
 
 
@@ -24,6 +27,9 @@ async def me(token: str) -> dict:
 
     async with aiohttp.ClientSession(headers=headers) as session:
         async with session.get("https://discord.com/api/users/@me") as response:
-            if response.status != 200:
-                raise APIError("Failed to get me")
+            match response.status:
+                case 200:
+                    pass
+                case _:
+                    raise APIError("Request failed")
             return await response.json()
