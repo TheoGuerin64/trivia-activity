@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field, PositiveInt
 
-from .db.schemas import Difficulty
+from .api.trivia import Category, Difficulty
 
 
 class Auth(BaseModel):
@@ -11,3 +11,14 @@ class Auth(BaseModel):
 class Settings(BaseModel):
     round_count: int | None = Field(ge=1, le=10, default=None)
     difficulty: Difficulty | None = Field(default=None)
+    category: Category | None = Field(default=None)
+
+    def data(self) -> dict[str, int | str]:
+        result = {}
+        if self.round_count is not None:
+            result["round_count"] = self.round_count
+        if self.difficulty is not None:
+            result["difficulty"] = self.difficulty.name
+        if self.category is not None:
+            result["category"] = self.category.name
+        return result

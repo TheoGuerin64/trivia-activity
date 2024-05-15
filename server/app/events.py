@@ -105,9 +105,9 @@ class Events(AsyncNamespace):
                 room_settings.round_count = settings.round_count
             if settings.difficulty is not None:
                 room_settings.difficulty = settings.difficulty
+            if settings.category is not None:
+                room_settings.category = settings.category
 
             await session.commit()
 
-            await self.emit(
-                "settings_update", room_settings.data(), room=str(room_user.room_id), skip_sid=sid
-            )
+            await self.emit("settings_update", raw_settings, room=str(room.id), skip_sid=sid)

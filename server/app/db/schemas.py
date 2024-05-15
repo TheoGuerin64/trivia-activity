@@ -6,6 +6,7 @@ from sqlalchemy import CHAR, BigInteger, ForeignKey, Select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from ..api.trivia import Category, Difficulty
 from . import Base
 
 
@@ -140,19 +141,13 @@ class Room(Base):
         return f"<Room id={self.id}>"
 
 
-class Difficulty(Enum):
-    RANDOM = 0
-    EASY = 1
-    MEDIUM = 2
-    HARD = 3
-
-
 class RoomSettings(Base):
     __tablename__ = "room_settings"
 
     room_id: Mapped[int] = mapped_column(ForeignKey("rooms.id"), primary_key=True)
     round_count: Mapped[int] = mapped_column(default=10)
     difficulty: Mapped[Difficulty] = mapped_column(default=Difficulty.RANDOM)
+    category: Mapped[Category] = mapped_column(default=Category.RANDOM)
 
     _room: Mapped[Room] = relationship("Room", back_populates="_settings")
 
@@ -172,6 +167,7 @@ class RoomSettings(Base):
         return {
             "round_count": self.round_count,
             "difficulty": self.difficulty.value,
+            "category": self.category.value,
         }
 
     def __repr__(self) -> str:
