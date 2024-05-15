@@ -5,3 +5,7 @@ export const socket = io({
   transports: ['websocket'],
   path: '/server/socket.io',
 })
+
+socket.on('error', (value) => {
+  console.error(value)
+})

@@ -16,10 +16,6 @@ export const useUserStore = defineStore('user', () => {
         isLeader.value = value.is_leader
       }
     })
-
-    socket.on('error', (value) => {
-      console.log(value)
-    })
   }
 
   return { isLeader, bindEvents }
