@@ -6,7 +6,7 @@ from sqlalchemy import CHAR, BigInteger, ForeignKey, Select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from ..api.trivia import Category, Difficulty
+from ..api.trivia import Difficulty
 from . import Base
 
 
@@ -92,6 +92,8 @@ class Room(Base):
     channel_id: Mapped[int] = mapped_column(BigInteger, index=True, unique=True)
     state: Mapped[RoomState] = mapped_column(default=RoomState.LOBBY)
     leader_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    question_count: Mapped[int] = mapped_column(default=0)
+    answer: Mapped[str | None] = mapped_column(default=None)
 
     _room_users: Mapped[list[RoomUser]] = relationship(
         "RoomUser", back_populates="_room", cascade="delete"
@@ -147,7 +149,7 @@ class RoomSettings(Base):
     room_id: Mapped[int] = mapped_column(ForeignKey("rooms.id"), primary_key=True)
     round_count: Mapped[int] = mapped_column(default=10)
     difficulty: Mapped[Difficulty] = mapped_column(default=Difficulty.RANDOM)
-    category: Mapped[Category] = mapped_column(default=Category.RANDOM)
+    category: Mapped[int] = mapped_column(default=0)
 
     _room: Mapped[Room] = relationship("Room", back_populates="_settings")
 
@@ -167,7 +169,7 @@ class RoomSettings(Base):
         return {
             "round_count": self.round_count,
             "difficulty": self.difficulty.value,
-            "category": self.category.value,
+            "category": self.category,
         }
 
     def __repr__(self) -> str:

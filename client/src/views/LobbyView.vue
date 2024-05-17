@@ -1,11 +1,5 @@
 <script setup lang="ts">
-import {
-  Category,
-  CategoryNames,
-  Difficulty,
-  DifficultyNames,
-  useSettingsStore,
-} from '@/stores/settings'
+import { Difficulty, useSettingsStore } from '@/stores/settings'
 import { useUserStore } from '@/stores/user'
 
 const settingsStore = useSettingsStore()
@@ -33,17 +27,18 @@ function submit() {}
       <label>
         Difficulty:
         <select v-model="settingsStore.difficulty" :disabled="!userStore.isLeader">
-          <option v-for="(value, key) in Difficulty" :key="key" :value="value">
-            {{ DifficultyNames[value] }}
-          </option>
+          <option :value="Difficulty.RANDOM">Any Difficulty</option>
+          <option :value="Difficulty.EASY">Easy</option>
+          <option :value="Difficulty.MEDIUM">Medium</option>
+          <option :value="Difficulty.HARD">Hard</option>
         </select>
       </label>
 
       <label>
         Category:
         <select v-model="settingsStore.category" :disabled="!userStore.isLeader">
-          <option v-for="(value, key) in Category" :key="key" :value="value">
-            {{ CategoryNames[value] }}
+          <option v-for="(value, key) in settingsStore.categories" :key="key" :value="value[0]">
+            {{ value[1] }}
           </option>
         </select>
       </label>

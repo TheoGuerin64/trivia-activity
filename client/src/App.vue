@@ -15,15 +15,20 @@ connectionStore.bindEvents()
 userStore.bindEvents()
 settingsStore.bindEvents()
 
-onMounted(async () => {
+async function connect() {
   await sdk.ready()
   const code = await authorize()
   connectionStore.connect(code)
+}
+
+onMounted(() => {
+  connect()
+  settingsStore.fetchCategories()
 })
 </script>
 
 <template>
-  <router-view v-slot="{ Component }" v-if="connectionStore.connected">
+  <router-view v-slot="{ Component }" v-if="connectionStore.connected && settingsStore.categories">
     <template v-if="Component">
       <keep-alive>
         <suspense timeout="0">
