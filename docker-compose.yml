@@ -1,8 +1,8 @@
 services:
   client-app:
     build: client
-    env_file:
-      - client.env
+    environment:
+      - VITE_DISCORD_CLIENT_ID=${DISCORD_CLIENT_ID}
     volumes:
       - ./client/:/app/
     networks:
@@ -16,8 +16,10 @@ services:
     build:
       context: server
       target: dev
-    env_file:
-      - server.env
+    environment:
+      - DISCORD_CLIENT_ID=${DISCORD_CLIENT_ID}
+      - DISCORD_CLIENT_SECRET=${DISCORD_CLIENT_SECRET}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-unsecure}
     volumes:
       - ./server/:/app/
     networks:
@@ -26,8 +28,8 @@ services:
       - server-db
   server-db:
     image: postgres
-    env_file:
-      - server.env
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-unsecure}
     networks:
       - server-network
   server-adminer:
