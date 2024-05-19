@@ -17,7 +17,7 @@ engine = create_async_engine(
 Session = async_sessionmaker(engine, expire_on_commit=False)
 
 
-class Base(AsyncAttrs, DeclarativeBase):
+class BaseSchema(AsyncAttrs, DeclarativeBase):
     pass
 
 
@@ -26,5 +26,5 @@ async def init_tables():
 
     async with engine.begin() as conn:
         if __debug__:
-            await conn.run_sync(Base.metadata.drop_all)
-        await conn.run_sync(Base.metadata.create_all)
+            await conn.run_sync(BaseSchema.metadata.drop_all)
+        await conn.run_sync(BaseSchema.metadata.create_all)
