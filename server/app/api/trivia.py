@@ -31,8 +31,10 @@ class Question(BaseModel):
     correct_answer: str
     incorrect_answers: list[str]
 
-    @field_validator("question", "correct_answer", "incorrect_answers")
+    @field_validator("category", "question", "correct_answer", "incorrect_answers")
     def unescape_html(cls, value):
+        if isinstance(value, list):
+            return [unescape(item) for item in value]
         return unescape(value)
 
 
