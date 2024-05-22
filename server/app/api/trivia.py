@@ -25,8 +25,8 @@ class Difficulty(StrEnum):
 
 class Question(BaseModel):
     type: str
-    difficulty: str
     category: str
+    difficulty: str
     question: str
     correct_answer: str
     incorrect_answers: list[str]
