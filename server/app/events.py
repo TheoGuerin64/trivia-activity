@@ -2,9 +2,9 @@ from pydantic import ValidationError
 from socketio import AsyncNamespace
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from .api import APIError, discord
+from .api import APIError, discord, trivia
 from .db import Session
-from .db.schemas import Room, RoomSettings, RoomState, RoomUser, User
+from .db.schemas import Room, RoomQuestion, RoomSettings, RoomState, RoomUser, User
 from .models import Auth, Settings
 from .session import UserData, get_user_data_session, save_user_data_session
 from .settings import DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET
@@ -100,3 +100,30 @@ class Events(AsyncNamespace):
             await session.commit()
 
         await self.emit("settings_update", raw_settings, room=str(room.id), skip_sid=sid)
+
+    async def on_start_game(self, sid: str) -> None:
+        user_id, room_id = await get_user_data_session(self, sid)
+
+        async with Session() as session:
+            room_user = await RoomUser.get(session, user_id, room_id)
+            if not await room_user.is_leader():
+                return
+
+            room = await room_user.room
+            if room.state != RoomState.LOBBY:
+                return
+
+            room.state = RoomState.PLAYING
+            await session.commit()
+
+            await self.emit("start_game", room=str(room_user.room_id))
+
+            room_settings = await room.settings
+            question = await trivia.question(room_settings.category, room_settings.difficulty)
+
+            room_question = RoomQuestion.from_model(room.id, question)
+            session.add(room_question)
+
+            await session.commit()
+
+            await self.emit("question", room_question.to_client(), room=str(room.id))

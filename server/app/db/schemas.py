@@ -1,13 +1,15 @@
 from __future__ import annotations
 
 from enum import Enum, auto
+from random import shuffle
+from typing import Optional, Self
 
 from sqlalchemy import CHAR, BigInteger, ForeignKey, Select
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from ..api.trivia import Difficulty
+from ..api.trivia import Difficulty, Question
 from . import BaseSchema
 
 
@@ -127,6 +129,9 @@ class Room(BaseSchema):
     _settings: Mapped[RoomSettings] = relationship(
         "RoomSettings", back_populates="_room", cascade="delete"
     )
+    _question: Mapped[Optional[RoomQuestion]] = relationship(
+        "RoomQuestion", back_populates="_room", cascade="delete"
+    )
 
     @property
     async def room_users(self) -> list[RoomUser]:
@@ -217,3 +222,79 @@ class RoomSettings(BaseSchema):
 
     def __repr__(self) -> str:
         return f"<RoomSettings room_id={self.room_id}>"
+
+
+class RoomQuestion(BaseSchema):
+    __tablename__ = "questions"
+
+    room_id: Mapped[int] = mapped_column(ForeignKey("rooms.id"), primary_key=True)
+    category: Mapped[str]
+    difficulty: Mapped[Difficulty]
+    question: Mapped[str]
+    correct_answer: Mapped[str]
+    incorrect_answer_1: Mapped[str]
+    incorrect_answer_2: Mapped[Optional[str]] = mapped_column(default=None)
+    incorrect_answer_3: Mapped[Optional[str]] = mapped_column(default=None)
+
+    _room: Mapped[Optional[Room]] = relationship("Room", back_populates="_question")
+
+    @property
+    async def room(self) -> Optional[Room]:
+        return await self.awaitable_attrs._room
+
+    def __init__(
+        self,
+        room_id: int,
+        category: str,
+        difficulty: Difficulty,
+        question: str,
+        correct_answer: str,
+        incorrect_answer_1: str,
+        incorrect_answer_2: Optional[str],
+        incorrect_answer_3: Optional[str],
+    ) -> None:
+        super().__init__(
+            room_id=room_id,
+            category=category,
+            difficulty=difficulty,
+            question=question,
+            correct_answer=correct_answer,
+            incorrect_answer_1=incorrect_answer_1,
+            incorrect_answer_2=incorrect_answer_2,
+            incorrect_answer_3=incorrect_answer_3,
+        )
+
+    @classmethod
+    def from_model(cls, room_id: int, question: Question) -> Self:
+        return cls(
+            room_id=room_id,
+            category=question.category,
+            difficulty=Difficulty(question.difficulty),
+            question=question.question,
+            correct_answer=question.correct_answer,
+            incorrect_answer_1=question.incorrect_answers[0],
+            incorrect_answer_2=(
+                question.incorrect_answers[1] if len(question.incorrect_answers) > 1 else None
+            ),
+            incorrect_answer_3=(
+                question.incorrect_answers[2] if len(question.incorrect_answers) > 2 else None
+            ),
+        )
+
+    def to_client(self) -> dict[str, str | list[str]]:
+        answers = [self.correct_answer, self.incorrect_answer_1]
+        if self.incorrect_answer_2:
+            answers.append(self.incorrect_answer_2)
+        if self.incorrect_answer_3:
+            answers.append(self.incorrect_answer_3)
+        shuffle(answers)
+
+        return {
+            "category": self.category,
+            "difficulty": self.difficulty.value,
+            "question": self.question,
+            "answers": answers,
+        }
+
+    def __repr__(self) -> str:
+        return f"<Question id={self.room_id}>"

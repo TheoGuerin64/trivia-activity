@@ -1,17 +1,26 @@
 <script setup lang="ts">
+import { useGameStore } from '@/stores/game'
 import { Difficulty, useSettingsStore } from '@/stores/settings'
 import { useUserStore } from '@/stores/user'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 const settingsStore = useSettingsStore()
 const userStore = useUserStore()
+const gameStore = useGameStore()
 
-function submit() {}
+gameStore.$subscribe((_mutation, state) => {
+  if (state.started) {
+    router.push({ name: 'game' })
+  }
+})
 </script>
 
 <template>
   <main>
     <h1>Lobby</h1>
-    <form @submit.prevent="submit">
+    <form @submit.prevent="gameStore.start_game">
       <label>
         Rounds:
         <input
