@@ -1,5 +1,5 @@
 from enum import Enum, StrEnum, auto
-from html import unescape
+from urllib.parse import unquote
 
 import aiohttp
 from pydantic import BaseModel, field_validator
@@ -32,14 +32,17 @@ class Question(BaseModel):
     incorrect_answers: list[str]
 
     @field_validator("category", "question", "correct_answer", "incorrect_answers")
-    def unescape_html(cls, value):
+    def decode(cls, value):
         if isinstance(value, list):
-            return [unescape(item) for item in value]
-        return unescape(value)
+            return [unquote(item) for item in value]
+        return unquote(value)
 
 
 async def question(category: int, difficulty: Difficulty) -> Question:
-    params: dict[str, str | list[str]] = {"amount": "1"}
+    params: dict[str, str | list[str]] = {
+        "encode": "url3986",
+        "amount": "1",
+    }
     if category != 0:
         params["category"] = str(category)
     if difficulty != Difficulty.RANDOM:
