@@ -8,7 +8,7 @@ interface UserData {
 }
 
 export const useUserStore = defineStore('user', () => {
-  const isLeader = ref(false)
+  const isLeader = ref<boolean>(false)
 
   function bindEvents() {
     socket.on('user_data', (value: UserData) => {

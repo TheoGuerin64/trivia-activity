@@ -5,7 +5,7 @@ import { socket } from '@/socket'
 import { ref } from 'vue'
 
 export const useConnectionStore = defineStore('connection', () => {
-  const connected = ref(false)
+  const connected = ref<boolean>(false)
 
   function bindEvents() {
     socket.on('connect', () => {
