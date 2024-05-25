@@ -9,6 +9,6 @@ class Auth(BaseModel):
 
 
 class Settings(BaseModel):
-    round_count: int | None = Field(ge=1, le=10, default=None)
-    difficulty: Difficulty | None = Field(default=None)
-    category: int | None = Field(default=None)
+    round_count: int = Field(ge=1, le=10)
+    difficulty: Difficulty
+    category: PositiveInt

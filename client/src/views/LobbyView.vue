@@ -25,7 +25,7 @@ gameStore.$subscribe((_mutation, state) => {
         Rounds:
         <input
           type="number"
-          v-model="settingsStore.roundCount"
+          v-model="settingsStore.settings.round_count"
           min="1"
           max="10"
           @keydown.prevent
@@ -35,7 +35,7 @@ gameStore.$subscribe((_mutation, state) => {
 
       <label>
         Difficulty:
-        <select v-model="settingsStore.difficulty" :disabled="!userStore.isLeader">
+        <select v-model="settingsStore.settings.difficulty" :disabled="!userStore.isLeader">
           <option :value="Difficulty.RANDOM">Any Difficulty</option>
           <option :value="Difficulty.EASY">Easy</option>
           <option :value="Difficulty.MEDIUM">Medium</option>
@@ -45,7 +45,7 @@ gameStore.$subscribe((_mutation, state) => {
 
       <label>
         Category:
-        <select v-model="settingsStore.category" :disabled="!userStore.isLeader">
+        <select v-model="settingsStore.settings.category" :disabled="!userStore.isLeader">
           <option v-for="(value, key) in settingsStore.categories" :key="key" :value="value[0]">
             {{ value[1] }}
           </option>

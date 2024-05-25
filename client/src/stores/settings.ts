@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 
 import { socket } from '@/socket'
-import { ref, watch } from 'vue'
+import { reactive, ref, watch } from 'vue'
 
 export enum Difficulty {
   RANDOM = 'random',
@@ -10,30 +10,25 @@ export enum Difficulty {
   HARD = 'hard',
 }
 
-interface SettingsData {
-  round_count?: number
-  difficulty?: string
-  category?: number
+interface Settings {
+  round_count: number
+  difficulty: string
+  category: number
 }
 
 export const useSettingsStore = defineStore('settings', () => {
   const categories = ref<Map<number, string> | null>(null)
-
-  const roundCount = ref(10)
-  const category = ref(0)
-  const difficulty = ref(Difficulty.RANDOM)
+  const settings = reactive<Settings>({
+    round_count: 10,
+    difficulty: Difficulty.RANDOM,
+    category: 0,
+  })
 
   function bindEvents() {
-    socket.on('settings_update', (data: SettingsData) => {
-      if (data.round_count !== undefined) {
-        roundCount.value = data.round_count
-      }
-      if (data.difficulty !== undefined) {
-        difficulty.value = data.difficulty as Difficulty
-      }
-      if (data.category !== undefined) {
-        category.value = data.category
-      }
+    socket.on('settings_update', (data: Settings) => {
+      settings.round_count = data.round_count
+      settings.difficulty = data.difficulty
+      settings.category = data.category
     })
   }
 
@@ -46,17 +41,9 @@ export const useSettingsStore = defineStore('settings', () => {
     }
   }
 
-  watch(roundCount, (value: number) => {
-    socket.emit('settings_update', { round_count: value })
+  watch(settings, (value: Settings) => {
+    socket.emit('settings_update', value)
   })
 
-  watch(difficulty, (value: Difficulty) => {
-    socket.emit('settings_update', { difficulty: value.valueOf() })
-  })
-
-  watch(category, (value: number) => {
-    socket.emit('settings_update', { category: value })
-  })
-
-  return { roundCount, difficulty, category, bindEvents, fetchCategories, categories }
+  return { settings, bindEvents, fetchCategories, categories }
 })

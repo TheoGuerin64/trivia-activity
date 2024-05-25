@@ -93,9 +93,9 @@ class Events(AsyncNamespace):
                 return
 
             room_settings = await room.settings
-            for key, value in settings:
-                if value is not None:
-                    setattr(room_settings, key, value)
+            room_settings.round_count = settings.round_count
+            room_settings.difficulty = settings.difficulty
+            room_settings.category = settings.category
 
             await session.commit()
 
