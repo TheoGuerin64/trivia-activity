@@ -141,6 +141,10 @@ class Room(BaseSchema):
     async def settings(self) -> RoomSettings:
         return await self.awaitable_attrs._settings
 
+    @property
+    async def question(self) -> Optional[RoomQuestion]:
+        return await self.awaitable_attrs._question
+
     def __init__(self, channel_id: int, leader_id: int) -> None:
         super().__init__(channel_id=channel_id, leader_id=leader_id)
 
